@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v4.6.5/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 750px;
+            width: 100%;
+        }
+    </style>
+    <script src="./assets/v4.6.5/ol.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <title>07_geoserver数据服务</title>
+</head>
+
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // 定义视图
+        const view = new ol.View({
+            center: [9446868.296874993, 2571872.496798376],
+            zoom: 4
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        })
+
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+
+        //使用tileWMS加载geoserver发布的wms服务
+        // http://localhost:8080/geoserver/company/wms?service=WMS&version=1.1.0&request=GetMap&layers=company%3AIndian_States&bbox=68.18624899229724%2C6.755952899606655%2C97.41529266802229%2C37.078268059623326&width=740&height=768&srs=EPSG%3A4326&styles=&format=application/openlayers
+        const tileSource = new ol.source.TileWMS({
+            url: 'http://localhost:8080/geoserver/company/wms',
+            params: { 'LAYERS': 'company:Indian_States' },
+            serverType: 'geoserver',
+        })
+
+        const tileLayer = new ol.layer.Tile({
+            source: tileSource
+        })
+
+        // map.addLayer(tileLayer)
+
+
+        // 使用ImageWMS加载geoserver发布的wms服务
+        const imageSource = new ol.source.ImageWMS({
+            url: 'http://localhost:8080/geoserver/company/wms',
+            params: { 'LAYERS': 'company:Indian_States' },
+        })
+
+        const imageLayer = new ol.layer.Image({
+            source: imageSource
+        })
+
+        map.addLayer(imageLayer)
+
+
+        //点击事件
+        map.on('click', (e) => {
+            const viewResolution = view.getResolution() //分辨率
+            const coordinate = e.coordinate //坐标
+            const projection = view.getProjection() //投影
+            const param = { 'INFO_FORMAT': 'application/json' }
+
+            const url = imageSource.getGetFeatureInfoUrl(coordinate, viewResolution, projection, param)
+
+            const source = new ol.source.Vector({
+                format: new ol.format.GeoJSON(),
+                url: url
+            })
+            const layer = new ol.layer.Vector({
+                source: source,
+                style: new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255,0,0,0.5)'
+                    })
+                })
+            })
+            map.addLayer(layer)
+
+            //获取点击的json数据
+            $.getJSON(url, (data) => {
+                const features = data.features
+                if (features.length) {
+                    console.log(features[0].properties['st_nm']);
+                } else {
+                    console.log('点击图层');
+                }
+            })
+
+        })
+
+
+        //使用geojson加载数据
+        const vectorSource = new ol.source.Vector({
+            format: new ol.format.GeoJSON(),
+            url: 'http://localhost:8080/geoserver/company/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=company%3AIndian_States&maxFeatures=50&outputFormat=application%2Fjson',
+
+        })
+
+        const vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        })
+
+// map.addLayer(vectorLayer)
+    </script>
+</body>
+
+</html>

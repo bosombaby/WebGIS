@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v4.6.5/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 750px;
+            width: 100%;
+        }
+    </style>
+    <script src="./assets/v4.6.5/ol.js"></script>
+    <title>01 认识OpenLayers</title>
+</head>
+
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // 定义视图
+        const view = new ol.View({
+            center: ol.proj.fromLonLat([119.4023786452461, 34.66956974386486]),
+            zoom: 12
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        })
+
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v4.6.5/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 750px;
+            width: 100%;
+        }
+    </style>
+    <script src="./assets/v4.6.5/ol.js"></script>
+    <title>03_栅格图层</title>
+</head>
+
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // 定义视图
+        const view = new ol.View({
+            center: [13295474.240172159, 4115509.6260626023],
+            zoom: 12
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        })
+
+        //加载stamen图层
+        const waterStamenLayer = new ol.layer.Tile({
+            source: new ol.source.Stamen({ layer: 'watercolor' })
+        })
+
+
+        // 图层安装先后顺序加载
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+
+
+        //加载自定义图片 ，法一
+        const peopleSource = new ol.source.ImageStatic({
+            attributions: '<b>图片</b>',
+            url: './assets/image/people.png',
+            imageExtent: [13282294.85419822, 4117316.7495201533, 13298270.19310982, 4124482.7209218885],
+        })
+
+        const peopleLayer = new ol.layer.Image({
+            source: peopleSource
+        })
+
+        map.addLayer(peopleLayer)
+
+        //加载自定义图片 ，法二
+
+        // 1 定义feature
+        const feature = new ol.Feature({
+            geometry: new ol.geom.Point([13282258.110811716, 4116011.921518731]),
+        })
+
+        const style = new ol.style.Style({
+            image: new ol.style.Icon({
+                src: './assets/image/tiger.png',
+                scale: 0.05
+            })
+        })
+
+        feature.setStyle(style)
+
+        // 2 定义source
+        const vectorSource = new ol.source.Vector({
+            features: [feature]
+        })
+
+        // 3 定义layer
+        const vectorLayer = new ol.layer.Vector({
+            source: vectorSource
+        })
+
+        // 4 添加layer
+        map.addLayer(vectorLayer)
+
+    </script>
+</body>
+
+</html>

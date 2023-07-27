@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+    <title>02_绘制图形</title>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = L.map('map').setView([39.56, 116.20], 5);
+
+        L.tileLayer('https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'bosom'
+        }).addTo(map);
+
+        L.marker([39.56, 116.20]).addTo(map)
+            .bindPopup('Hello Leaflet!<br />I am a popup.')
+            .openPopup();
+
+        //加载polygon
+        const latlngs = [[37, -109.05], [41, -109.03], [41, -102.05], [37, -102.04]];
+
+        const polygon = L.polygon(latlngs, { color: 'red', fillColor: 'skyblue' }).addTo(map);
+
+        map.fitBounds(polygon.getBounds());
+    </script>
+</body>
+
+</html>

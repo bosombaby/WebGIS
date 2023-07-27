@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v6.15.1/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+
+    <!-- 视频版本问题 bug-->
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <!-- 坐标系转换 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js"></script>
+    <title>02_投影坐标系</title>
+</head>
+
+<body>
+    <h2>My Map</h2>
+    <div id="map" class="map"></div>
+
+    <script type="text/javascript">
+        // 定义坐标系
+        proj4.defs("EPSG:32643", "+proj=utm +zone=43 +datum=WGS84 +units=m +no_defs");
+
+
+        // 定义视图
+        const view = new ol.View({
+            projection: 'EPSG:32643',
+            center: ol.proj.fromLonLat([116.39, 39.9]),
+            zoom: 5
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        })
+
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+    </script>
+</body>
+
+</html>

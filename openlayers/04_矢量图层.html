@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v4.6.5/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 750px;
+            width: 100%;
+        }
+    </style>
+    <script src="./assets/v4.6.5/ol.js"></script>
+    <title>04_矢量图层</title>
+</head>
+
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // 定义视图
+        const view = new ol.View({
+            projection: 'EPSG:4326', //修改为wgs84坐标系，要和geojson数据保持一致
+            center: [119.4023786452461, 34.66956974386486],
+            zoom: 12
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM({
+                wrapX: false
+            })
+        })
+
+
+        // 图层安装先后顺序加载
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+
+        //文件内部数据读入json数据
+        const lineJson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "coordinates": [
+                            [
+                                119.32394397498649,
+                                34.69532951371582
+                            ],
+                            [
+                                119.35729528683532,
+                                34.71800553594258
+                            ],
+                            [
+                                119.40995525290981,
+                                34.686257364557704
+                            ],
+                            [
+                                119.39014507519641,
+                                34.655115837905655
+                            ],
+                            [
+                                119.33572977691847,
+                                34.692649209500175
+                            ],
+                            [
+                                119.34801710233643,
+                                34.699040560865626
+                            ]
+                        ],
+                        "type": "LineString"
+                    }
+                }
+            ]
+        }
+
+        const lineSource = new ol.source.Vector({
+            features: (new ol.format.GeoJSON().readFeatures(lineJson))
+        })
+
+        const lineLayer = new ol.layer.Vector({
+            source: lineSource,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'red', // 线条颜色
+                    width: 5, // 线条宽度
+                    lineDash: [5, 10], // 线条样式，数组中的数字表示实线和虚线的长度
+                    lineCap: 'round', // 线条端点样式，可选值为butt、round、square
+                    lineJoin: 'round' // 线条连接处样式，可选值为bevel、round、miter
+                })
+            })
+
+        })
+
+
+        map.addLayer(lineLayer)
+
+        // 外部读取json数据
+        const polygonSource = new ol.source.Vector({
+            url: './assets/geojson/polygon.json',
+            format: new ol.format.GeoJSON()
+        })
+
+        const polygonLayer = new ol.layer.Vector({
+            source: polygonSource,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 5,
+                    color: '#ffcc33',
+                })
+            })
+        })
+
+        map.addLayer(polygonLayer)
+
+        // 热力图
+        const heatmapSource = new ol.source.Vector({
+            url: './assets/geojson/heatmap.json',
+            format: new ol.format.GeoJSON()
+        })
+
+        const heatmapLayer = new ol.layer.Heatmap({
+            source: heatmapSource,
+        })
+
+        map.addLayer(heatmapLayer)
+
+        //创建网格
+        const graticule = new ol.Graticule({
+            map: map,
+            showLabels: true,
+        })
+
+
+    </script>
+</body>
+
+</html>

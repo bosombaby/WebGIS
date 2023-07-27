@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./assets/v4.6.5/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 750px;
+            width: 100%;
+        }
+    </style>
+    <script src="./assets/v4.6.5/ol.js"></script>
+    <title>01 认识OpenLayers</title>
+</head>
+
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // 定义视图
+        const view = new ol.View({
+            center: ol.proj.fromLonLat([119.4023786452461, 34.66956974386486]),
+            zoom: 12
+        })
+
+        // 定义图层
+        const osmLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        })
+
+        const layerArray = [osmLayer]
+
+        // 定义地图
+        const map = new ol.Map({
+            target: 'map',
+            layers: layerArray,
+            view: view
+        })
+
+        //添加矢量图层
+        const lygSource = new ol.source.Vector({
+            url: './assets/geojson/lyg.json',
+            format: new ol.format.GeoJSON()
+        })
+
+
+        const lygLayer = new ol.layer.Vector({
+            source: lygSource,
+            style: (feature) => {
+                const type = feature.getGeometry().getType()
+                const properties = feature.getProperties()
+
+                switch (type) {
+                    case 'LineString':
+                        return new ol.style.Style({
+                            stroke: new ol.style.Stroke({
+                                color: 'skyblue',
+                                width: 5
+                            })
+                        })
+                    case 'Polygon':
+                        return new ol.style.Style({
+                            fill: new ol.style.Fill({
+                                color: 'rgba(255, 255, 255, 0.6)'
+                            }),
+
+                            stroke: new ol.style.Stroke({
+                                color: 'pink',
+                                width: 5
+                            })
+                        })
+                    case 'Point':
+                        return new ol.style.Style({
+                            image: new ol.style.Icon({
+                                src: './assets/image/tiger.png',
+                                scale: 0.05
+                            })
+                        })
+                    default:
+                        break;
+
+                }
+            }
+
+        })
+
+        map.addLayer(lygLayer)
+
+        //获取所有layers
+        setTimeout(() => {
+            const layers = map.getLayers().getArray()
+            const line1 = layers[1].getSource().getFeatures()[0]
+        }, 2000)
+    </script>
+</body>
+
+</html>
